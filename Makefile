@@ -7,9 +7,13 @@ default: $(TARGETS)
 all: default
 
 $(TARGETS): %: %.c
-	$(CC) $(CFLAGS) -o $@ $<
+	$(CC) $(CFLAGS) $(LIBS) -o $@ $<
 
-.PRECIOUS: $(TARGETS)
+libuv-server:
+	$(CC) $(CFLAGS) $(LIBS) -o libuv-server libuv-server.c
+
+.PRECIOUS: $(TARGETS) libuv-server
 
 clean:
 	-rm -f $(TARGETS)
+	-rm -f libuv-server
