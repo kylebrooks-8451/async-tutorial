@@ -7,12 +7,26 @@
 #include <errno.h>
 #include <poll.h>
 
+void signal_handler(int signal) {
+    _exit(0);
+}
+
 int main() {
     int sfd, cfd;
     struct sockaddr_in server, client;
     socklen_t clientLen;
     ssize_t bytesRead;
     char buffer[1024];
+
+    if (signal(SIGINT, signal_handler) == SIG_ERR) {
+        perror("signal");
+        return EXIT_FAILURE;
+    }
+
+    if (signal(SIGTERM, signal_handler) == SIG_ERR) {
+        perror("signal");
+        return EXIT_FAILURE;
+    }
 
     // Create TCP socket
     if ((sfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
@@ -62,6 +76,10 @@ int main() {
             }
         }
         printf("%.*s", (int) bytesRead, buffer);
+        if (write(cfd, buffer, bytesRead) == -1) {
+            perror("write");
+            return EXIT_FAILURE;
+        }
     }
     return EXIT_SUCCESS;
 }
